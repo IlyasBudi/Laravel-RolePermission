@@ -11,11 +11,25 @@ use Illuminate\Routing\Controllers\Middleware as ControllerMiddleware;
 
 class PermissionController extends Controller implements HasMiddleware
 {
+    /**
+     * Laravel 12: definisikan middleware di sini per aksi.
+     */
     public static function middleware(): array
     {
         return [
             new ControllerMiddleware('auth'),
-            new ControllerMiddleware('role:superadmin|admin'),
+
+            // List / index
+            (new ControllerMiddleware('permission:permissions.index|permissions.view'))->only(['index']),
+
+            // Create + Store
+            (new ControllerMiddleware('permission:permissions.create'))->only(['create','store']),
+
+            // Edit + Update
+            (new ControllerMiddleware('permission:permissions.update'))->only(['edit','update']),
+
+            // Delete
+            (new ControllerMiddleware('permission:permissions.delete'))->only(['destroy']),
         ];
     }
 

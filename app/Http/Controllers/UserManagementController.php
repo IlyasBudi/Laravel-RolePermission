@@ -19,8 +19,20 @@ class UserManagementController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
+            // selalu butuh login
             new ControllerMiddleware('auth'),
-            new ControllerMiddleware('role:superadmin|admin'),
+
+            // LIST user: butuh users.index (atau users.view)
+            (new ControllerMiddleware('permission:users.index|users.view'))->only(['index']),
+
+            // FORM edit user: butuh salah satu izin update/assign/grant
+            (new ControllerMiddleware('permission:users.update|users.assign-roles|users.grant-permissions'))->only(['edit']),
+
+            // Sinkron role: butuh izin khusus assign-roles (fallback: users.update)
+            (new ControllerMiddleware('permission:users.assign-roles|users.update'))->only(['syncRoles']),
+
+            // Sinkron permissions: butuh izin khusus grant-permissions (fallback: users.update)
+            (new ControllerMiddleware('permission:users.grant-permissions|users.update'))->only(['syncPermissions']),
         ];
     }
 

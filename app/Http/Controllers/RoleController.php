@@ -13,13 +13,28 @@ use Illuminate\Routing\Controllers\Middleware as ControllerMiddleware;
 class RoleController extends Controller implements HasMiddleware
 {
     /**
-     * Laravel 12: definisikan middleware di sini.
+     * Laravel 12: definisikan middleware di sini per aksi.
      */
     public static function middleware(): array
     {
         return [
+            // selalu butuh login
             new ControllerMiddleware('auth'),
-            new ControllerMiddleware('role:superadmin|admin'),
+
+            // LIST roles
+            (new ControllerMiddleware('permission:roles.index|roles.view'))->only(['index']),
+
+            // FORM create + store
+            (new ControllerMiddleware('permission:roles.create'))->only(['create','store']),
+
+            // FORM edit + update nama role
+            (new ControllerMiddleware('permission:roles.update'))->only(['edit','update']),
+
+            // Hapus role
+            (new ControllerMiddleware('permission:roles.delete'))->only(['destroy']),
+
+            // Sinkronisasi permissions ke role
+            (new ControllerMiddleware('permission:roles.sync-permissions|roles.update'))->only(['syncPermissions']),
         ];
     }
 

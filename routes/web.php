@@ -20,7 +20,7 @@ Route::post('/logout',  [AuthController::class, 'logout'])->name('logout')->midd
 Route::get('/', DashboardController::class)->name('dashboard')->middleware('auth');
 
 // ---------- Admin Panel (web) ----------
-Route::middleware(['auth','role:superadmin|admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
     // Roles
     Route::get('/roles',                [RoleController::class, 'index'])->name('roles.index');
     Route::get('/roles/create',         [RoleController::class, 'create'])->name('roles.create');
