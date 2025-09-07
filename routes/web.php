@@ -33,6 +33,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/roles',                [RoleController::class, 'index'])->name('roles.index');
     Route::get('/roles/create',         [RoleController::class, 'create'])->name('roles.create');
     Route::post('/roles',               [RoleController::class, 'store'])->name('roles.store');
+    Route::get('/roles/{role}',          [RoleController::class, 'show'])->name('roles.show');
     Route::get('/roles/{role}/edit',    [RoleController::class, 'edit'])->name('roles.edit');
     Route::put('/roles/{role}',         [RoleController::class, 'update'])->name('roles.update');
     Route::delete('/roles/{role}',      [RoleController::class, 'destroy'])->name('roles.destroy');
@@ -48,7 +49,17 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
     // Users
     Route::get('/users',               [UserManagementController::class, 'index'])->name('users.index');
+    Route::get('/users/create', [UserManagementController::class, 'create'])->name('users.create');
+    Route::post('/users',        [UserManagementController::class, 'store'])->name('users.store');
+
+    Route::get('/users/{user}',        [UserManagementController::class, 'show'])->name('users.show');
     Route::get('/users/{user}/edit',   [UserManagementController::class, 'edit'])->name('users.edit');
-    Route::post('/users/{user}/sync-roles',        [UserManagementController::class, 'syncRoles'])->name('users.sync-roles');
-    Route::post('/users/{user}/sync-permissions',  [UserManagementController::class, 'syncPermissions'])->name('users.sync-permissions');
+
+    // edit profil & password dari halaman edit user
+    Route::put('/users/{user}',                 [UserManagementController::class, 'updateProfile'])->name('users.update');
+    Route::put('/users/{user}/password',        [UserManagementController::class, 'updatePassword'])->name('users.password.update');
+
+    // sinkron role & permission
+    Route::post('/users/{user}/sync-roles',       [UserManagementController::class, 'syncRoles'])->name('users.sync-roles');
+    Route::post('/users/{user}/sync-permissions', [UserManagementController::class, 'syncPermissions'])->name('users.sync-permissions');
 });

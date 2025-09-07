@@ -10,6 +10,8 @@
             <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Permissions Management</h1>
             <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Create and manage application permissions</p>
         </div>
+
+        @can('permissions.create')
         <a href="{{ route('admin.permissions.create') }}" 
            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -17,6 +19,7 @@
             </svg>
             Create Permission
         </a>
+        @endcan
     </div>
 
     <!-- Permissions Table -->
@@ -42,9 +45,12 @@
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                 Created
                             </th>
+
+                            @canany(['permissions.update','permissions.delete'])
                             <th scope="col" class="relative px-6 py-3">
                                 <span class="sr-only">Actions</span>
                             </th>
+                            @endcanany
                         </tr>
                     </thead>
                     <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
@@ -86,12 +92,18 @@
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                     {{ $permission->created_at->format('M d, Y') }}
                                 </td>
+
+                                @canany(['permissions.update','permissions.delete'])
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <div class="flex items-center justify-end space-x-2">
+                                        @can('permissions.update')
                                         <a href="{{ route('admin.permissions.edit', $permission) }}" 
                                            class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
                                             Edit
                                         </a>
+                                        @endcan
+
+                                        @can('permissions.delete')
                                         <form method="POST" action="{{ route('admin.permissions.destroy', $permission) }}" 
                                               class="inline-block"
                                               onsubmit="return confirm('Are you sure you want to delete this permission?')">
@@ -102,8 +114,10 @@
                                                 Delete
                                             </button>
                                         </form>
+                                        @endcan
                                     </div>
                                 </td>
+                                @endcanany
                             </tr>
                         @endforeach
                     </tbody>
@@ -124,6 +138,7 @@
                 <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-white">No permissions found</h3>
                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Get started by creating your first permission.</p>
                 <div class="mt-6">
+                    @can('permissions.create')
                     <a href="{{ route('admin.permissions.create') }}" 
                        class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -131,6 +146,7 @@
                         </svg>
                         Create Permission
                     </a>
+                    @endcan
                 </div>
             </div>
         @endif

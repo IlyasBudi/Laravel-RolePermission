@@ -3,148 +3,168 @@
 @section('title', 'Edit User')
 
 @section('content')
-<div class="space-y-6">
-    <!-- Header -->
-    <div class="flex items-center justify-between">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Edit User</h1>
-            <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Manage user roles and permissions</p>
-        </div>
-        <a href="{{ route('admin.users.index') }}" 
-           class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-            </svg>
-            Back to Users
-        </a>
-    </div>
+@if ($errors->any())
+  <div class="mb-4 rounded-lg border border-red-300 bg-red-50 dark:bg-red-900/30 dark:border-red-800 p-3 text-sm text-red-700 dark:text-red-300">
+    <ul class="list-disc ml-5">
+      @foreach ($errors->all() as $err)
+        <li>{{ $err }}</li>
+      @endforeach
+    </ul>
+  </div>
+@endif
 
-    <!-- User Info Card -->
-    <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg">
-        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <div class="flex items-center">
-                <div class="flex-shrink-0 h-12 w-12">
-                    <div class="h-12 w-12 rounded-full bg-indigo-500 flex items-center justify-center">
-                        <span class="text-white font-medium text-lg">{{ substr($user->name, 0, 1) }}</span>
-                    </div>
-                </div>
-                <div class="ml-4">
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-white">{{ $user->name }}</h3>
-                    <p class="text-sm text-gray-500 dark:text-gray-400">{{ $user->email }}</p>
-                    @if($user->username)
-                        <p class="text-sm text-gray-500 dark:text-gray-400">{{ $user->username }}</p>
-                    @endif
-                </div>
+<div class="grid gap-6 lg:grid-cols-2">
+  {{-- Kiri: Edit Profil + Password --}}
+  <div class="space-y-6">
+    {{-- Edit Profil --}}
+    <section class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+      <div class="p-6">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Edit Profil</h2>
+        <form action="{{ route('admin.users.update', $user) }}" method="POST" class="mt-5 space-y-4">
+          @csrf
+          @method('PUT')
+
+          <div>
+            <label class="block text-sm mb-1">Nama</label>
+            <input type="text" name="name" value="{{ old('name', $user->name) }}"
+                   class="w-full rounded-lg border dark:border-gray-600 bg-white dark:bg-gray-900/50 px-3 py-2" required>
+          </div>
+
+          <div>
+            <label class="block text-sm mb-1">Email</label>
+            <input type="email" name="email" value="{{ old('email', $user->email) }}"
+                   class="w-full rounded-lg border dark:border-gray-600 bg-white dark:bg-gray-900/50 px-3 py-2" required>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Mengubah email akan mengatur ulang verifikasi.</p>
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm mb-1">Username (opsional)</label>
+              <input type="text" name="username" value="{{ old('username', $user->username) }}"
+                     class="w-full rounded-lg border dark:border-gray-600 bg-white dark:bg-gray-900/50 px-3 py-2">
             </div>
-        </div>
-        <div class="px-6 py-4">
-            <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
-                <div>
-                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Phone Number</dt>
-                    <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ $user->phone_number ?: 'Not provided' }}</dd>
-                </div>
-                <div>
-                    <dt class="text-sm font-medium text-gray-500 dark:text-gray-400">Joined</dt>
-                    <dd class="mt-1 text-sm text-gray-900 dark:text-white">{{ $user->created_at->format('M d, Y') }}</dd>
-                </div>
-            </dl>
-        </div>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Roles Management -->
-        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg">
-            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-white">User Roles</h3>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Assign roles to this user</p>
+            <div>
+              <label class="block text-sm mb-1">No. HP (opsional)</label>
+              <input type="tel" name="phone_number" value="{{ old('phone_number', $user->phone_number) }}"
+                     class="w-full rounded-lg border dark:border-gray-600 bg-white dark:bg-gray-900/50 px-3 py-2" maxlength="15">
             </div>
-            
-            <form method="POST" action="{{ route('admin.users.sync-roles', $user) }}" class="p-6">
-                @csrf
-                
-                <div class="space-y-3">
-                    @forelse($roles as $role)
-                        <div class="flex items-center">
-                            <input id="role_{{ $role->id }}" name="roles[]" type="checkbox" value="{{ $role->name }}"
-                                   {{ in_array($role->name, $userRoles) ? 'checked' : '' }}
-                                   class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700">
-                            <label for="role_{{ $role->id }}" class="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300">
-                                {{ $role->name }}
-                            </label>
-                        </div>
-                    @empty
-                        <p class="text-sm text-gray-500 dark:text-gray-400">No roles available.</p>
-                    @endforelse
-                </div>
+          </div>
 
-                @if($roles->count() > 0)
-                    <div class="mt-6">
-                        <button type="submit" 
-                                class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
-                            Update Roles
-                        </button>
-                    </div>
-                @endif
-            </form>
-        </div>
+          <div class="pt-2">
+            <button class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white">Simpan Profil</button>
+          </div>
+        </form>
+      </div>
+    </section>
 
-        <!-- Permissions Management -->
-        <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg">
-            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-white">Direct Permissions</h3>
-                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Grant specific permissions to this user</p>
+    {{-- Ganti Password --}}
+    <section class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700" x-data="{ showNew:false, showConf:false }">
+      <div class="p-6">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Ganti Password</h2>
+        <form action="{{ route('admin.users.password.update', $user) }}" method="POST" class="mt-5 space-y-4">
+          @csrf
+          @method('PUT')
+
+          <div class="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm mb-1">Password Baru</label>
+              <div class="relative">
+                <input :type="showNew ? 'text' : 'password'" name="password"
+                       class="w-full rounded-lg border dark:border-gray-600 bg-white dark:bg-gray-900/50 px-3 py-2 pr-12" required>
+                <button type="button" class="absolute inset-y-0 right-0 px-3 text-sm" @click="showNew = !showNew">Tampil</button>
+              </div>
             </div>
-            
-            <form method="POST" action="{{ route('admin.users.sync-permissions', $user) }}" class="p-6">
-                @csrf
-                
-                <div class="space-y-3 max-h-96 overflow-y-auto">
-                    @forelse($permissions as $permission)
-                        <div class="flex items-center">
-                            <input id="permission_{{ $permission->id }}" name="permissions[]" type="checkbox" value="{{ $permission->name }}"
-                                   {{ in_array($permission->name, $userPerms) ? 'checked' : '' }}
-                                   class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 dark:border-gray-600 rounded dark:bg-gray-700">
-                            <label for="permission_{{ $permission->id }}" class="ml-3 text-sm font-medium text-gray-700 dark:text-gray-300">
-                                {{ $permission->name }}
-                            </label>
-                        </div>
-                    @empty
-                        <p class="text-sm text-gray-500 dark:text-gray-400">No permissions available.</p>
-                    @endforelse
-                </div>
-
-                @if($permissions->count() > 0)
-                    <div class="mt-6">
-                        <button type="submit" 
-                                class="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 dark:focus:ring-offset-gray-800">
-                            Update Permissions
-                        </button>
-                    </div>
-                @endif
-            </form>
-        </div>
-    </div>
-
-    <!-- Current Permissions Summary -->
-    <div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg">
-        <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h3 class="text-lg font-medium text-gray-900 dark:text-white">Current Permissions Summary</h3>
-            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">All permissions this user has (from roles and direct assignments)</p>
-        </div>
-        <div class="p-6">
-            <div class="flex flex-wrap gap-2">
-                @php
-                    $allPermissions = $user->getAllPermissions();
-                @endphp
-                @forelse($allPermissions as $permission)
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                        {{ $permission->name }}
-                    </span>
-                @empty
-                    <p class="text-sm text-gray-500 dark:text-gray-400">This user has no permissions.</p>
-                @endforelse
+            <div>
+              <label class="block text-sm mb-1">Konfirmasi Password</label>
+              <div class="relative">
+                <input :type="showConf ? 'text' : 'password'" name="password_confirmation"
+                       class="w-full rounded-lg border dark:border-gray-600 bg-white dark:bg-gray-900/50 px-3 py-2 pr-12" required>
+                <button type="button" class="absolute inset-y-0 right-0 px-3 text-sm" @click="showConf = !showConf">Tampil</button>
+              </div>
             </div>
+          </div>
+
+          <div class="pt-2">
+            <button class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white">Update Password</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </div>
+
+  {{-- Kanan: Roles & Direct Permissions --}}
+  <div class="space-y-6" x-data="{ checkAllRoles:false, checkAllPerm:false }">
+    {{-- Roles --}}
+    <section class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+      <div class="p-6">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Roles</h2>
+          <label class="text-xs inline-flex items-center gap-2 text-gray-600 dark:text-gray-300">
+            <input type="checkbox" x-model="checkAllRoles"
+                   @change="document.querySelectorAll('input[name=\'roles[]\']').forEach(cb => cb.checked = checkAllRoles)"
+                   class="rounded"> Select all
+          </label>
         </div>
-    </div>
+
+        <form action="{{ route('admin.users.sync-roles', $user) }}" method="POST" class="mt-4">
+          @csrf
+          <div class="max-h-72 overflow-auto border border-gray-200 dark:border-gray-700 rounded-lg p-3 grid sm:grid-cols-2 gap-2">
+            @foreach ($roles as $r)
+              <label class="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
+                <input type="checkbox" name="roles[]" value="{{ $r->name }}" class="rounded"
+                       @checked(in_array($r->name, $userRoles))>
+                {{ $r->name }}
+              </label>
+            @endforeach
+          </div>
+
+          <div class="mt-4">
+            <button class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white">Simpan Roles</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    {{-- Direct Permissions (langsung ke user) --}}
+    <section class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+      <div class="p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Direct Permissions</h2>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Izin yang diberikan <em>langsung</em> ke user (bukan lewat role). Cocok untuk pengecualian/akses temporer.
+              Untuk skala besar tetap kelola lewat <strong>role</strong>. Cek `can()` akan menggabungkan izin dari role + direct permission.
+            </p>
+          </div>
+          <label class="text-xs inline-flex items-center gap-2 text-gray-600 dark:text-gray-300">
+            <input type="checkbox" x-model="checkAllPerm"
+                   @change="document.querySelectorAll('input[name=\'permissions[]\']').forEach(cb => cb.checked = checkAllPerm)"
+                   class="rounded"> Select all
+          </label>
+        </div>
+
+        <form action="{{ route('admin.users.sync-permissions', $user) }}" method="POST" class="mt-4">
+          @csrf
+          <div class="max-h-72 overflow-auto border border-gray-200 dark:border-gray-700 rounded-lg p-3 grid sm:grid-cols-2 gap-2">
+            @foreach ($permissions as $p)
+              <label class="inline-flex items-center gap-2 text-sm text-gray-700 dark:text-gray-200">
+                <input type="checkbox" name="permissions[]" value="{{ $p->name }}" class="rounded"
+                       @checked(in_array($p->name, $userPerms))>
+                {{ $p->name }}
+              </label>
+            @endforeach
+          </div>
+
+          <div class="mt-4">
+            <button class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white">Simpan Direct Permissions</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div class="mt-6">
+  <a href="{{ route('admin.users.index') }}" class="px-4 py-2 rounded-lg border dark:border-gray-600">Kembali</a>
 </div>
 @endsection

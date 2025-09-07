@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 // ✅ L12: daftarkan middleware via interface HasMiddleware
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -40,7 +42,12 @@ class RoleController extends Controller implements HasMiddleware
 
     public function index()
     {
-        $roles = Role::with('permissions')->orderBy('name')->paginate(15);
+        $roles = Role::query()
+            ->withCount('permissions')
+            ->withCount(['users as users_count' => function($q){ $q->select(DB::raw('count(*)')); }])
+            ->orderBy('name')
+            ->paginate(15);
+
         return view('admin.roles.index', compact('roles'));
     }
 
@@ -63,6 +70,38 @@ class RoleController extends Controller implements HasMiddleware
         return redirect()
             ->route('admin.roles.index')
             ->with('success', 'Role berhasil dibuat.');
+    }
+
+    public function show(Request $request, Role $role)
+    {
+        $q = $request->string('q')->toString();
+
+        // permission yang sudah melekat pada role
+        $assignedPermissions = $role->permissions()->orderBy('name')->get();
+        $assignedNames       = $assignedPermissions->pluck('name')->toArray();
+
+        // semua permission (untuk form sinkron)
+        $allPermissions = Permission::orderBy('name')->get();
+
+        // daftar user yang memiliki role ini
+        $users = User::query()
+            ->role($role->name)
+            ->when($q, fn($s) => $s->where(function($w) use ($q) {
+                $w->where('name','like',"%{$q}%")
+                ->orWhere('email','like',"%{$q}%");
+            }))
+            ->orderBy('name')
+            ->paginate(12)
+            ->withQueryString();
+
+        return view('admin.roles.show', compact(
+            'role',
+            'assignedPermissions',
+            'assignedNames',
+            'allPermissions',
+            'users',
+            'q'
+        ));
     }
 
     public function edit(Role $role)
