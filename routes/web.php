@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
@@ -16,8 +17,6 @@ Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('regi
 Route::post('/register',[AuthController::class, 'register'])->name('register.attempt')->middleware('guest');
 
 Route::post('/logout',  [AuthController::class, 'logout'])->name('logout')->middleware('auth');
-
-// ---------- Profile ----------
 
 // ---------- Dashboard ----------
 Route::get('/', DashboardController::class)->name('dashboard')->middleware('auth');
@@ -62,4 +61,25 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // sinkron role & permission
     Route::post('/users/{user}/sync-roles',       [UserManagementController::class, 'syncRoles'])->name('users.sync-roles');
     Route::post('/users/{user}/sync-permissions', [UserManagementController::class, 'syncPermissions'])->name('users.sync-permissions');
+});
+
+// ---------- Password Reset ----------
+Route::middleware('guest')->group(function () {
+    // form minta link reset
+    Route::get('/forgot-password', [PasswordResetController::class, 'showLinkRequestForm'])
+        ->name('password.request');
+
+    // kirim link reset via email
+    Route::post('/forgot-password', [PasswordResetController::class, 'sendResetLink'])
+        ->middleware('throttle:6,1')
+        ->name('password.email');
+
+    // form reset password (via link di email)
+    Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetForm'])
+        ->name('password.reset');
+
+    // submit reset password
+    Route::post('/reset-password', [PasswordResetController::class, 'resetPassword'])
+        ->middleware('throttle:6,1')
+        ->name('password.update');
 });
