@@ -46,7 +46,7 @@ class UserManagementController extends Controller implements HasMiddleware
                   ->orWhere('email', 'like', "%{$q}%");
             }))
             ->orderBy('name')
-            ->paginate(15)
+            ->paginate(10)
             ->withQueryString();
 
         return view('admin.users.index', compact('users', 'q'));
