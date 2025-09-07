@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('admin.layouts.app')
 
 @section('title', 'Dashboard')
 
@@ -96,6 +96,7 @@
     </div>
 
     <!-- Quick Actions - Lebih Minimalis -->
+     @canany(['users.index', 'roles.index', 'permissions.index', 'roles.create'])
     <div class="bg-white dark:bg-gray-800 shadow rounded-xl border border-gray-200 dark:border-gray-700">
         <div class="p-6">
             <div class="flex items-center justify-between mb-6">
@@ -168,5 +169,6 @@
             </div>
         </div>
     </div>
+    @endcanany
 </div>
 @endsection

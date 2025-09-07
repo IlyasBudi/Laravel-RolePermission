@@ -78,12 +78,12 @@
 <body class="bg-gray-50 dark:bg-gray-900 font-sans antialiased transition-colors duration-300" x-data="{ sidebarOpen: false }">
     <div class="min-h-screen flex">
         <!-- Include Sidebar Component -->
-        <x-sidebar />
+        <x-admin.sidebar />
 
         <!-- Main Content -->
         <div class="flex-1 flex flex-col overflow-hidden">
             <!-- Include Navbar Component -->
-            <x-navbar />
+            <x-admin.navbar />
 
             <!-- Page Content -->
             <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
@@ -101,7 +101,7 @@
             </main>
 
             <!-- Include Footer Component -->
-            <x-footer />
+            <x-admin.footer />
         </div>
     </div>
 

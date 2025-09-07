@@ -147,8 +147,8 @@
                     <span class="text-white font-bold text-xs">{{ substr(auth()->user()->name, 0, 1) }}</span>
                 </div>
                 <div class="flex-1 min-w-0">
-                    <p class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ auth()->user()->name }}</p>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 truncate">Administrator</p>
+                    <a href="{{ route('admin.profile.show') }}" class="text-sm font-medium text-gray-900 dark:text-white truncate">{{ auth()->user()->name }}</a>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ auth()->user()->getRoleNames()->implode(', ') }}</p>
                 </div>
             </div>
             <div class="mt-2 flex items-center justify-between">

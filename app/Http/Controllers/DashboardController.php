@@ -8,6 +8,6 @@ class DashboardController extends Controller
 {
     public function __invoke()
     {
-        return view('dashboard'); // resources/views/dashboard.blade.php
+        return view('admin.dashboard'); // resources/views/dashboard.blade.php
     }
 }
