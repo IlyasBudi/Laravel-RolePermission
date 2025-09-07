@@ -3,7 +3,7 @@
 
 @section('content')
 <div class="text-center mb-8">
-    <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Forgot Password? 🔐</h2>
+    <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Forgot Password?</h2>
     <p class="text-sm text-gray-600 dark:text-gray-400">
         No worries! Enter your email and we'll send you a reset link
     </p>
