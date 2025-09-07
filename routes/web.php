@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\ProfileController;
 
 // ---------- Auth (web session) ----------
 Route::get('/login',    [AuthController::class, 'showLoginForm'])->name('login')->middleware('guest');
@@ -16,11 +17,18 @@ Route::post('/register',[AuthController::class, 'register'])->name('register.att
 
 Route::post('/logout',  [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
+// ---------- Profile ----------
+
 // ---------- Dashboard ----------
 Route::get('/', DashboardController::class)->name('dashboard')->middleware('auth');
 
 // ---------- Admin Panel (web) ----------
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    // Profile
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
+
     // Roles
     Route::get('/roles',                [RoleController::class, 'index'])->name('roles.index');
     Route::get('/roles/create',         [RoleController::class, 'create'])->name('roles.create');
