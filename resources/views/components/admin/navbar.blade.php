@@ -12,9 +12,8 @@
                 <h2 class="text-lg font-semibold text-gray-800 dark:text-white">
                     @yield('title', 'Dashboard')
                 </h2>
-                <p class="text-xs text-gray-500 dark:text-gray-400">
-                    {{ now()->format('M j, Y') }}
-                </p>
+                <p x-data="clock()" x-init="start()" x-text="display" x-cloak
+                class="text-xs text-gray-500 dark:text-gray-400"></p>
             </div>
         </div>
 
@@ -129,3 +128,53 @@
         </div>
     </div>
 </header>
+
+<script>
+  document.addEventListener('alpine:init', () => {
+    Alpine.data('clock', (opts = {}) => ({
+      // opsi
+      tz: opts.tz ?? (localStorage.getItem('tz') || Intl.DateTimeFormat().resolvedOptions().timeZone),
+      locale: opts.locale ?? 'id-ID',
+      withTzName: opts.withTzName ?? true,   // tampilkan nama zona (short)
+      tickMs: opts.tickMs ?? 1000,           // interval update
+
+      // state
+      now: new Date(),
+      timer: null,
+
+      start(){ this.timer = setInterval(() => this.now = new Date(), this.tickMs) },
+      stop(){ if (this.timer) clearInterval(this.timer) },
+
+      setTz(val){
+        if (!val || val === 'auto') {
+          this.tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+          localStorage.removeItem('tz');
+        } else {
+          this.tz = val;
+          localStorage.setItem('tz', val);
+        }
+      },
+
+      get display(){
+        try {
+          const o = {
+            timeZone: this.tz,
+            weekday: 'short', day: '2-digit', month: 'short', year: 'numeric',
+            hour: '2-digit', minute: '2-digit', second: '2-digit',
+            hour12: false
+          };
+          if (this.withTzName) o.timeZoneName = 'short'; // contoh: GMT+7, WIB mungkin tidak selalu muncul
+          return new Intl.DateTimeFormat(this.locale, o).format(this.now);
+        } catch (e) {
+          // timezone invalid -> fallback ke timezone browser
+          const o = {
+            weekday: 'short', day: '2-digit', month: 'short', year: 'numeric',
+            hour: '2-digit', minute: '2-digit', second: '2-digit',
+            hour12: false
+          };
+          return new Intl.DateTimeFormat(this.locale, o).format(this.now);
+        }
+      }
+    }));
+  });
+</script>
