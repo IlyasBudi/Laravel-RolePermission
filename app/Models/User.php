@@ -16,7 +16,7 @@ class User extends Authenticatable implements CanResetPasswordContract
     use HasApiTokens, Notifiable, HasRoles, CanResetPassword;
 
     // Jika ingin pastikan guard untuk Spatie (default 'web'):
-    // protected $guard_name = 'web';
+    protected $guard_name = 'web';
 
     protected $fillable = [
         'name',

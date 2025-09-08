@@ -18,7 +18,6 @@ class PermissionAndRoleSeeder extends Seeder
             'roles'       => ['index', 'view', 'create', 'update', 'delete', 'sync-permissions'],
             'permissions' => ['index', 'view', 'create', 'update', 'delete'],
             'users'       => ['index', 'view', 'create', 'update', 'delete', 'assign-roles', 'grant-permissions'],
-            'posts'       => ['index', 'view', 'create', 'update', 'delete'],
         ];
 
         $all = [];
@@ -47,22 +46,20 @@ class PermissionAndRoleSeeder extends Seeder
                 'roles.view','roles.create','roles.update','roles.delete','roles.sync-permissions',
                 'permissions.view','permissions.create','permissions.update','permissions.delete',
                 'users.view','users.create','users.update','users.delete','users.assign-roles','users.grant-permissions',
-                'posts.view','posts.create','posts.update','posts.delete',
             ]);
         }
 
         // staff: kelola konten + view users
         if ($staff) {
             $staff->syncPermissions([
-                'posts.view','posts.create','posts.update',
-                'users.view',
+                'roles.view',
             ]);
         }
 
         // user: hanya view posts
         if ($user) {
             $user->syncPermissions([
-                'posts.view',
+                'roles.view',
             ]);
         }
     }
