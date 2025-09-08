@@ -1,4 +1,4 @@
-# Laravel Role & Permission Management System
+# Laravel Role & Permission Starter Kit
 
 <div align="center">
 
