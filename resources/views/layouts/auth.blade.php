@@ -16,6 +16,15 @@
     
     <!-- Alpine.js -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <style>
+        /* Sembunyikan tombol 'show password' bawaan Edge/IE */
+        input[type="password"]::-ms-reveal,
+        input[type="password"]::-ms-clear {
+        display: none;
+        }
+
+    </style>
     
     <script>
         tailwind.config = {
@@ -119,9 +128,9 @@
 
             <!-- Footer -->
             <div class="text-center">
-                <p class="text-sm text-gray-600 dark:text-gray-400 transition-colors duration-300">
+                <!-- <p class="text-sm text-gray-600 dark:text-gray-400 transition-colors duration-300">
                     © {{ date('Y') }} {{ config('app.name') }}. All rights reserved.
-                </p>
+                </p> -->
                 <p class="text-xs text-gray-500 dark:text-gray-500 mt-1 transition-colors duration-300">
                     Powered by Laravel & Tailwind CSS
                 </p>
